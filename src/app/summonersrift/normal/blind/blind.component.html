@@ -1,0 +1,73 @@
+
+  <div class="card bg-light shadow">
+    <div class="card-header">
+      <h2 class="text-center">Blind pick</h2>
+    </div>
+    <div class="card-body">
+      <div class="text-center">
+        <img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/profileicon/{{currentSummoner.profileIconId}}.png" alt="{{currentSummoner.profileIconId}}" class="img-fluid mx-auto"
+          style="max-height: 11vh; max-width: 10vw;">
+      </div>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th scope="row">Summoner name</th>
+            <td>{{currentSummoner.name}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Summoner level</th>
+            <td>{{currentSummoner.summonerLevel}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Games played</th>
+            <td>{{rank.games}}</td>
+          </tr>
+          <tr style="cursor: pointer" (click)="rowWr = !rowWr">
+            <th scope="row">Winrate</th>
+            <td>{{rank.wr}}</td>
+            <td>
+              <img *ngIf="!rowWr" src="/assets/misc-icons/chevron-compact-down.svg" class="img-fluid">
+              <img *ngIf="rowWr" src="/assets/misc-icons/chevron-compact-up.svg" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="rowWr">
+            <th scope="row" class="text-secondary">Wins</th>
+            <td>{{rank.wins}}</td>
+          </tr>
+          <tr *ngIf="rowWr">
+            <th scope="row" class="text-secondary">Losses</th>
+            <td>{{rank.losses}}</td>
+          </tr>
+
+          <tr *ngIf="!champ" style="cursor: pointer" (click)="toggleChamp()">
+            <th scope="row">Best champ</th>
+            <td><img *ngIf="!(bestChamp.name === 'None')" src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/{{bestChamp.name}}.png"
+                class="img-fluid" style="max-width: 25px"> {{bestChamp.wr}}</td>
+            <td>
+              <img *ngIf="!champ" src="/assets/misc-icons/chevron-compact-down.svg" class="img-fluid">
+              <img *ngIf="champ" src="/assets/misc-icons/chevron-compact-up.svg" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="champ" (click)="toggleChamp()" style="cursor: pointer">
+            <th>Overview</th>
+            <th></th>
+            <td>
+              <img src="/assets/misc-icons/chevron-compact-up.svg" style="cursor: pointer" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="champ" style="cursor: pointer" (click)="toggleChamp()">
+            <th>Champion</th>
+            <th>Games</th>
+            <th>WR</th>
+          </tr>
+          <tr *ngFor="let champ of champs">
+            <td><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/{{champ.name}}.png"
+                class="img-fluid" style="max-width: 25px" title="{{champ.name}}"></td>
+            <td>{{champ.games}}</td>
+            <td>{{champ.wr}}</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>

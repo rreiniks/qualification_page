@@ -1,13 +1,19 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'qualification_page';
+  title = 'lol-page';
+
+  loadedFeature = 'summoner';
+
+  onNavigate(feature: Event) {
+    console.log('test');
+    console.log(feature);
+    // this.loadedFeature = feature.fea;
+  }
+
 }

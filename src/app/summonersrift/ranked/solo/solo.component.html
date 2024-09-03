@@ -1,0 +1,113 @@
+
+  <div class="card bg-light shadow">
+    <div class="card-header">
+      <h2 class="text-center">Ranked solo/duo</h2>
+    </div>
+    <div class="card-body">
+      <div class="text-center">
+        <img *ngIf="!(rank.name === 'None')" src="/assets/ranked-emblems/Emblem_{{rank.name}}.png" alt="{{rank.name}}" class="img-fluid mx-auto"
+          style="max-height: 11vh; max-width: 10vw;">
+      </div>
+      <table class="table">
+        <tbody>
+          <tr (click)="rowRank = !rowRank" style="cursor: pointer">
+            <th scope="row">Rank</th>
+            <td>{{rank.name}} {{rank.rank}}</td>
+            <td>
+              <img *ngIf="!rowRank" src="/assets/misc-icons/chevron-compact-down.svg" class="img-fluid">
+              <img *ngIf="rowRank" src="/assets/misc-icons/chevron-compact-up.svg" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="rowRank">
+            <th scope="row" class="text-secondary">LP</th>
+            <td>{{rank.lp}}</td>
+          </tr>
+          <tr *ngIf="rowRank && inPromo">
+            <th scope="row" class="text-secondary">Promo</th>
+            <td>
+              <ng-container *ngFor="let val of promo">{{ val }}</ng-container>
+            </td>
+          </tr>
+
+          <tr>
+            <th scope="row">Games played</th>
+            <td>{{rank.games}}</td>
+          </tr>
+          <tr style="cursor: pointer" (click)="rowWr = !rowWr">
+            <th scope="row">Winrate</th>
+            <td>{{rank.wr}}</td>
+            <td>
+              <img *ngIf="!rowWr" src="/assets/misc-icons/chevron-compact-down.svg" class="img-fluid">
+              <img *ngIf="rowWr" src="/assets/misc-icons/chevron-compact-up.svg" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="rowWr">
+            <th scope="row" class="text-secondary">Wins</th>
+            <td>{{rank.wins}}</td>
+          </tr>
+          <tr *ngIf="rowWr">
+            <th scope="row" class="text-secondary">Losses</th>
+            <td>{{rank.losses}}</td>
+          </tr>
+
+          <tr *ngIf="!role" style="cursor: pointer" (click)="toggleRole()">
+            <th scope="row">Best role</th>
+            <td><img *ngIf="!(bestRole === 'None')" src="/assets/positions/{{bestRole}}.png" class="img-fluid mx-auto" style="max-width: 25px">
+              {{bestRole}}</td>
+            <td>
+              <img src="/assets/misc-icons/chevron-compact-down.svg" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="role" (click)="toggleRole()" style="cursor: pointer">
+            <th>Role overview</th>
+            <td></td>
+            <td>
+              <img src="/assets/misc-icons/chevron-compact-up.svg" style="cursor: pointer" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="role" style="cursor: pointer" (click)="toggleRole()">
+            <th>Role</th>
+            <th>Games</th>
+            <th>
+              WR
+            </th>
+          </tr>
+          <tr *ngFor="let role of roles">
+            <th class="text-secondary"><img src="/assets/positions/{{role.name}}.png" class="img-fluid mx-auto"
+                style="max-width: 25px"> {{role.name}}</th>
+            <td>{{role.games}}</td>
+            <td>{{role.wr}}</td>
+          </tr>
+
+          <tr *ngIf="!champ" style="cursor: pointer" (click)="toggleChamp()">
+            <th scope="row">Best champ</th>
+            <td><img *ngIf="!(bestChamp.name === 'None')" src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/{{bestChamp.name}}.png"
+                class="img-fluid" style="max-width: 25px"> {{bestChamp.wr}}</td>
+            <td>
+              <img *ngIf="!champ" src="/assets/misc-icons/chevron-compact-down.svg" class="img-fluid">
+              <img *ngIf="champ" src="/assets/misc-icons/chevron-compact-up.svg" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="champ" (click)="toggleChamp()" style="cursor: pointer">
+            <th>Overview</th>
+            <th></th>
+            <td>
+              <img src="/assets/misc-icons/chevron-compact-up.svg" style="cursor: pointer" class="img-fluid">
+            </td>
+          </tr>
+          <tr *ngIf="champ" style="cursor: pointer" (click)="toggleChamp()">
+            <th>Champion</th>
+            <th>Games</th>
+            <th>WR</th>
+          </tr>
+          <tr *ngFor="let champ of champs">
+            <td><img src="http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/{{champ.name}}.png"
+                class="img-fluid" style="max-width: 25px" title="{{champ.name}}"></td>
+            <td>{{champ.games}}</td>
+            <td>{{champ.wr}}</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>

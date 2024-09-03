@@ -1,0 +1,27 @@
+<div class="container p-5 my-5 text-white">
+  <div class="row">
+    <label for="name" class="display-1 pb-5 text-center">Input your summoner name</label>
+    <input [(ngModel)]="username" type="text" id="name" class="form-control" name="name">
+    <label for="region" class="display-1 pb-5 pt-5 text-center">Choose your region</label>
+    <select [(ngModel)]="region" id="region" class="form-control" name="region">
+      <option value="EUW1">Europe West</option>
+      <option value="BR1">Brazil</option>
+      <option value="EUN1">Europe North-East</option>
+      <option value="JP1">Japan</option>
+      <option value="KR">Korea</option>
+      <option value="LA1">Latin America North</option>
+      <option value="LA2">Latin America South</option>
+      <option value="NA1">North America</option>
+      <option value="OC1">Oceania</option>
+      <option value="RU">Russia</option>
+      <option value="TR1">Turkey</option>
+    </select>
+    <div class="mx-auto d-grid col-1 pt-5">
+      <button *ngIf="!search" (click)="onSearch()" class="btn-info btn">SEARCH</button>
+      <p>{{loadingMsg}}</p>
+      <div class="progress" *ngIf="search">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+      </div>
+    </div>
+  </div>
+</div>

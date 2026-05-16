@@ -1,0 +1,78 @@
+# ==========================================
+# 1. AIZMUGURSERVERIS (Data API)
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-api
+  template:
+    metadata:
+      labels:
+        app: web-api
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k3s-app
+      containers:
+      - name: web-api
+        image: docker.io/library/web-api:latest
+        imagePullPolicy: Never  # Kritiski lokālai videi!
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-api
+spec:
+  selector:
+    app: web-api
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+# ==========================================
+# 2. MĀJASLAPA (Angular Frontend)
+# ==========================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-frontend
+  template:
+    metadata:
+      labels:
+        app: web-frontend
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k3s-app
+      containers:
+      - name: web-frontend
+        image: docker.io/library/web-frontend:latest
+        imagePullPolicy: Never  # Kritiski lokālai videi!
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-frontend
+spec:
+  type: NodePort  # Ļauj mums piekļūt lapai no pārlūka, izmantojot IP adresi
+  selector:
+    app: web-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080

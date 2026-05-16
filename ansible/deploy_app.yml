@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Izveidot K3s attēlu mapi (ja neeksistē)
+      file:
+        path: /var/lib/rancher/k3s/agent/images/
+        state: directory
+
+    - name: Kopēt API attēlu K3s automātiskajā importā
+      copy:
+        src: ../app/qualification_page/web-api.tar
+        dest: /var/lib/rancher/k3s/agent/images/web-api.tar
+
+    - name: Kopēt Web attēlu K3s automātiskajā importā
+      copy:
+        src: ../app/qualification_page/web-frontend.tar
+        dest: /var/lib/rancher/k3s/agent/images/web-frontend.tar

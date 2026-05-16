@@ -1,0 +1,18 @@
+# Izmantojam Node.js bāzi
+FROM node:18-alpine
+
+# Iestatām darba mapi
+WORKDIR /usr/src/app
+
+# Kopējam package.json un instalējam atkarības
+COPY package*.json ./
+RUN npm install
+
+# Kopējam pilnīgi visu tavu koda mapi
+COPY . .
+
+# Atveram portu 3000, uz kura griežas tavs Express
+EXPOSE 3000
+
+# Palaižam serveri tieši caur server_test.js
+CMD ["node", "server_test.js"]

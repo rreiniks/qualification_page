@@ -1,0 +1,91 @@
+---
+- name: Phase 1 - Setup Master
+  hosts: master
+  become: yes
+  tasks:
+    - name: Set hostname to k3s-master
+      hostname:
+        name: k3s-master
+
+    - name: Install K3s Master
+      shell: curl -sfL https://get.k3s.io | sh -
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Get cluster token
+      command: cat /var/lib/rancher/k3s/server/node-token
+      register: node_token
+
+- name: Phase 2 - Setup Workers
+  hosts: workers
+  become: yes
+  tasks:
+    - name: Set worker hostname
+      hostname:
+        name: "{{ 'k3s-app' if inventory_hostname in groups['app_node'] else 'k3s-db' }}"
+
+    - name: Install K3s Agent and Join Cluster
+      shell: >
+        curl -sfL https://get.k3s.io | 
+        K3S_URL=https://{{ groups['master'][0] }}:6443 
+        K3S_TOKEN={{ hostvars[groups['master'][0]]['node_token'].stdout }} 
+        sh -s - agent --node-name {{ 'k3s-app' if inventory_hostname in groups['app_node'] else 'k3s-db' }}
+      args:
+        creates: /usr/local/bin/k3s
+
+- name: Phase 3 - Final Configuration & Database
+  hosts: master
+  become: yes
+  tasks:
+    - name: Gaidīt, kamēr visi mezgli parādās sarakstā (līdz 2 minūtēm)
+      command: k3s kubectl get nodes
+      register: nodes_list
+      until: 
+        - '"k3s-app" in nodes_list.stdout'
+        - '"k3s-db" in nodes_list.stdout'
+      retries: 24
+      delay: 5
+
+    - name: Marķēt DB mezglu
+      command: "k3s kubectl label node k3s-db capability=database --overwrite"
+
+    - name: Marķēt APP mezglu
+      command: "k3s kubectl label node k3s-app capability=application --overwrite"
+
+    - name: Kopēt MySQL manifestu uz master
+      copy:
+        src: ../k3s/mysql-deployment.yaml
+        dest: /tmp/mysql-deployment.yaml
+
+    - name: Apply MySQL Deployment
+      command: k3s kubectl apply -f /tmp/mysql-deployment.yaml
+
+    - name: Kopēt SQL shēmu uz master
+      copy:
+        src: ../k3s/mysql-init.sql
+        dest: /tmp/mysql-init.sql
+
+    - name: Importēt datubāzes shēmu
+      shell: |
+        # 1. Gudri gaidām, kamēr konteiners vispār ielādējas un kļūst "Ready" (līdz 5 minūtēm)
+        k3s kubectl wait --for=condition=Ready pod -l app=mysql --timeout=300s
+        
+        POD_NAME=$(k3s kubectl get pods -l app=mysql -o jsonpath='{.items[0].metadata.name}')
+        
+        # 2. Pat ja pods ir gatavs, pats MySQL dzinējs vēl var lādēties. 
+        # Taisām mazu ciklu, kas klauvē pie durvīm, kamēr tās atveras.
+        until k3s kubectl exec -i $POD_NAME -- mysql -u root -ptesta_parole_123 -e "SELECT 1" >/dev/null 2>&1; do
+          echo "Gaidām, kamēr MySQL sāks pieņemt savienojumus..."
+          sleep 5
+        done
+        
+        # 3. Kad durvis vaļā, gāžam iekšā shēmu!
+        k3s kubectl exec -i $POD_NAME -- mysql -u root -ptesta_parole_123 < /tmp/mysql-init.sql
+
+    - name: Kopēt Datu sēšanas Jobu
+      copy:
+        src: ../k3s/data-seed-job.yaml
+        dest: /tmp/data-seed-job.yaml
+
+    - name: Palaist datu ģenerēšanu
+      shell: k3s kubectl apply -f /tmp/data-seed-job.yaml

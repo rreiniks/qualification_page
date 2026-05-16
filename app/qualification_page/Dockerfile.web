@@ -1,0 +1,15 @@
+# 1. POSMS: Angular kompilācija
+FROM node:18-alpine AS build
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+# Kompilējam produkcijas versiju
+RUN npm run build --prod
+
+# 2. POSMS: Nginx serveris
+FROM nginx:alpine
+# Kopējam Angular failus
+COPY dist/qualification_page/browser /usr/share/nginx/html
+# Kopējam mūsu SPA konfigurāciju un PĀRRAKSTĀM Nginx noklusējumu!
+COPY nginx.conf /etc/nginx/conf.d/default.conf

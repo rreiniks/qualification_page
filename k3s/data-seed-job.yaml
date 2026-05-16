@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: riot-data-seeder
+spec:
+  template:
+    spec:
+      containers:
+      - name: seeder
+        image: db-seeder:latest
+        imagePullPolicy: Never 
+      restartPolicy: OnFailure
